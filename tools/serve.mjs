@@ -4,9 +4,11 @@ import path from "node:path";
 const root = path.resolve(process.argv[2] || "."), port = +(process.argv[3] || 5533);
 const T = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".json": "application/json", ".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".svg": "image/svg+xml", ".mp4": "video/mp4", ".woff2": "font/woff2", ".ico": "image/x-icon" };
 http.createServer((req, res) => {
-  let p = path.normalize(decodeURIComponent(req.url.split("?")[0]));
-  if (p.endsWith("/")) p += "index.html";
-  const f = path.join(root, p);
+  let p = decodeURIComponent(req.url.split("?")[0]);
+  if (p.endsWith("/") || p.endsWith("\\") || p === "") p += "index.html";
+  p = path.normalize(p);
+  if (p.endsWith(path.sep)) p = path.join(p, "index.html");
+  const f = path.resolve(root, "." + path.sep + p);
   if (!f.startsWith(root)) {
     res.writeHead(403).end();
     return;
