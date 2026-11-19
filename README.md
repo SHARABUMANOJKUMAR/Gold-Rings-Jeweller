@@ -107,27 +107,13 @@ flowchart LR
 ## 🚀 Resolving Vercel 404 Deployment Issue
 
 ### Why did Vercel show `404: NOT_FOUND`?
-By default, Vercel expects `index.html` to be present at the root directory (`./`). Because the project's web assets are organized inside the `site/` directory (`site/index.html`), Vercel initially deployed an empty root directory.
+By default, Vercel deploys from the root directory (`./`) and looks for `index.html`. Initially, the files were tucked into a subfolder (`site/`), so Vercel deployed an empty root directory and returned a 404 error.
 
 ### How We Solved It:
-1. **Added `vercel.json` Routing Configuration**:
-   ```json
-   {
-     "$schema": "https://openapi.vercel.sh/vercel.json",
-     "cleanUrls": true,
-     "rewrites": [
-       { "source": "/", "destination": "/site/index.html" },
-       { "source": "/((?!site/).*)", "destination": "/site/$1" }
-     ]
-   }
-   ```
-   *This automatically routes incoming requests for `/`, `/css/*`, `/js/*`, and `/assets/*` straight into the `site/` directory.*
-
-2. **Alternative (Dashboard Configuration)**:
-   - Go to [Vercel Dashboard](https://vercel.com) → Select **Gold-Rings-Jeweller**.
-   - Navigate to **Settings** → **General**.
-   - Under **Root Directory**, click **Edit**, select or type **`site`**, and click **Save**.
-   - Redeploy or trigger a git push.
+1. **Root Directory Optimization**:
+   Moved all website files (`index.html`, `css/`, `js/`, `assets/`, `vendor/`) directly into the project root directory. Vercel now detects and deploys `index.html` instantly on every push with zero configuration.
+2. **Added `vercel.json`**:
+   Configured `cleanUrls: true` for clean URL structures.
 
 ---
 
@@ -147,7 +133,7 @@ git clone https://github.com/SHARABUMANOJKUMAR/Gold-Rings-Jeweller.git
 cd Gold-Rings-Jeweller
 
 # 3. Start local development server
-node tools/serve.mjs site 5533
+node tools/serve.mjs . 5533
 ```
 
 Open your browser at:
@@ -159,15 +145,24 @@ Open your browser at:
 
 ```text
 Gold-Rings-Jeweller/
-├── vercel.json               # Vercel deployment rewrites & routing
+├── index.html                # Main entry HTML structure
+├── css/
+│   ├── style.css             # Typography, layout, and component styles
+│   └── journey.css           # Scrollytelling, canvas stage, and pins
+├── js/
+│   ├── main.js               # Cart, wishlist, quick-view, search
+│   └── journey.js            # Canvas frame sequencing & ScrollTrigger
+├── vendor/                   # GSAP, ScrollTrigger, Lenis
+├── assets/                   # 4K video, ring frames, box sequence, photos
+├── vercel.json               # Vercel deployment configuration
 ├── README.md                 # Complete project documentation & guide
-├── site/                     # Production web application
-│   ├── index.html            # Primary HTML structure
-│   ├── css/
-│   │   ├── style.css         # Typography, layout, and component styles
-│   │   └── journey.css       # Scrollytelling, canvas stage, and pins
-│   ├── js/
-│   │   ├── main.js           # Cart, wishlist, quick-view, search
+├── tools/
+│   └── serve.mjs             # Node.js HTTP server with range streaming
+├── docs/
+│   └── api.md                # Client storage & server documentation
+└── .ai-session/
+    └── state.json            # AI session tracking state
+```
 │   │   └── journey.js        # Canvas frame sequencing & ScrollTrigger
 │   ├── vendor/               # GSAP, ScrollTrigger, Lenis
 │   └── assets/               # 4K video, ring frames, box sequence, photos
